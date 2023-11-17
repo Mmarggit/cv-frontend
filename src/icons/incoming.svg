@@ -1,0 +1,6 @@
+<div style="height: 25px; width: 25px;" class="d-flex rounded-4 mx-sm-0 mx-auto">
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" class="rubicons export" width="36" height="56" viewBox="0 0 24 24" stroke="black" stroke-width="1.5">
+  <path d="M15 6l-3-3-3 3" stroke-linecap="round"/>
+  <path d="M12 16V3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M16 9h3v12H5V9h3" stroke-linecap="round"/>
+</svg></div>

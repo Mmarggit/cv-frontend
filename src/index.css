@@ -1,0 +1,350 @@
+:root {
+  ---primary: #6757F1;
+  --red_primary: #F8485D;
+  --red_primary_hover: #D14051;
+  --red_light_primary_hover: #FFE7EB;
+  --hover-primary: #4C3EC9;
+  --light-primary: #FAFAFF; /*#E1DFF8*/
+  --hover-light-primary: #E1DFF8; /*#E1DFF8*/
+  --hover-success: #057303;
+  --text: #222127;
+}
+
+* {
+  font-family : 'Mont'  
+}
+
+.lg\:grid-cols-4 {
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  }
+
+.font-display {
+  font-family: SuisseIntl,sans-serif;}
+
+.grid {
+  display: grid;}
+
+  .flex-1 {
+    flex: 1 1 0%;
+    }
+
+.w-full {
+      width: 100%;}
+.lg\:block {
+display: block;
+}
+
+.h-px {
+  height: 1px;
+  }
+.bg-black-c {
+    --tw-bg-opacity: 1;
+    background-color: rgb(204 204 204/var(--tw-bg-opacity));
+    }  
+.modal_window {
+  position: fixed;
+
+}
+#editor {
+  color:#057303;
+}
+
+#dropdown-btn {
+  color: #000;
+  background-color: white;
+  border: none;;
+}
+
+#dropdown-btn-2 {
+  color: #000;
+  background-color: gray;
+  border: solid 1px black;
+  border-radius: 4px;
+}
+
+/* .cv-par {
+  display: grid;
+
+} */
+
+.lg\:block {
+  display: block;
+  }
+
+  .cv-input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: transparent;
+    border: none;
+    display: block;
+    overflow: hidden;
+    padding: 0;
+    resize: none;
+    width: 100%;}
+
+
+
+
+
+textarea {
+  border: none;
+  outline: none;
+  height: auto;
+  resize: none;
+} 
+
+input {
+  border: none;
+  outline: none;
+  height: auto;
+  resize: none;
+} 
+
+        
+
+.text-surf-5 {
+  --tw-text-opacity: 1;
+  color: rgb(103 87 241/var(--tw-text-opacity));}
+@font-face {
+  font-family: 'Mont';
+  src: url('https://resource.studvoyage.ru/Mont-Bold.eot');
+  src: local('Mont Bold'), local('Mont-Bold'),
+      url('https://resource.studvoyage.ru/Mont-Bold.eot?#iefix') format('embedded-opentype'),
+      url('https://resource.studvoyage.ru/Mont-Bold.woff2') format('woff2'),
+      url('https://resource.studvoyage.ru/Mont-Bold.woff') format('woff'),
+      url('https://resource.studvoyage.ru/Mont-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Mont';
+  src: url('https://resource.studvoyage.ru/Mont-SemiBold.eot');
+  src: local('Mont SemiBold'), local('Mont-SemiBold'),
+      url('https://resource.studvoyage.ru/Mont-SemiBold.eot?#iefix') format('embedded-opentype'),
+      url('https://resource.studvoyage.ru/Mont-SemiBold.woff2') format('woff2'),
+      url('https://resource.studvoyage.ru/Mont-SemiBold.woff') format('woff'),
+      url('https://resource.studvoyage.ru/Mont-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Mont';
+  src: url('https://resource.studvoyage.ru/Mont-Regular.eot');
+  src: local('Mont Regular'), local('Mont-Regular'),
+      url('https://resource.studvoyage.ru/Mont-Regular.eot?#iefix') format('embedded-opentype'),
+      url('https://resource.studvoyage.ru/Mont-Regular.woff2') format('woff2'),
+      url('https://resource.studvoyage.ru/Mont-Regular.woff') format('woff'),
+      url('https://resource.studvoyage.ru/Mont-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Mont';
+  src: url('https://resource.studvoyage.ru/Mont-Light.eot');
+  src: local('Mont Light'), local('Mont-Light'),
+      url('https://resource.studvoyage.ru/Mont-Light.eot?#iefix') format('embedded-opentype'),
+      url('https://resource.studvoyage.ru/Mont-Light.woff2') format('woff2'),
+      url('https://resource.studvoyage.ru/Mont-Light.woff') format('woff'),
+      url('https://resource.studvoyage.ru/Mont-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+button {
+  outline: none;
+  border-width: 0;
+  border: none;
+  background-color: white;
+  color: #f57887 ;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+button.active {
+  color: #F8485D !important;
+  border: none;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+
+.content {
+  display: none;
+}
+
+.active-content {
+  display: block;
+}
+
+.active-tabs {
+  background: white;
+  border-bottom: 1px solid transparent;
+}
+
+
+.main-info {
+  display: grid;
+  grid-auto-rows: 50px;
+  padding-bottom: 0px;
+}
+
+.work-experience {
+  display: grid;
+  grid-auto-rows: 50px;
+  padding-top: 20px;
+  margin-bottom: 75px;
+}
+.work-experience-off {
+  display: none;
+}
+
+.education {
+  display: grid;
+  grid-auto-rows: 75px;
+  padding-top: 20px;
+  margin-bottom: 75px;
+}
+
+.centered-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.element-container {
+  padding-bottom: 40px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Создаем три столбца одинаковой ширины */
+  grid-gap: 10px; /* Добавляем промежутки между элементами */
+}
+
+.container {
+  position: relative;
+}
+
+.skill {
+  display: grid;
+  grid-auto-rows: 60px;
+  padding-top: 20px;
+  margin-bottom: 50px;
+}
+
+.skills-off {
+  display: none;
+}
+
+.activities {
+  display: grid;
+  padding-top: 20px;
+  margin-bottom: 75px;
+}
+
+.activities-off {
+  display: none;
+}
+
+.btn-contacts {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.courses {
+  display: grid;
+  padding-top: 20px;
+  margin-bottom: 75px;
+}
+
+.other {
+  display: grid;
+  padding-top: 20px;
+  margin-bottom: 75px;
+}
+
+
+.sidebar {
+  position: fixed;
+  top: 150;
+  right : 0;
+  height : fit-content;
+  min-height: 500px;
+  width: 300px;
+  background: white;
+  border: solid var(---primary) 1px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.sidebar .sbar {
+  border-bottom: solid var(---primary) 1px;
+}
+
+.parts {
+  display: grid;
+  padding-top: 20px;
+  grid-auto-rows: fit-content;
+  margin: 20px;
+}
+.parts button {
+  border: solid black 1px;
+  width: 100%;
+  height: 80%;
+  text-align: center;
+  color:#222127;
+  border-radius: 50px;
+  font-size: 1rem;
+  margin: 5px;
+  align-items: center;
+  justify-content: center;
+}
+
+.parts .butgr {
+  display : grid;
+  grid-template-rows: 1fr 1fr 1fr;
+}
+
+.parts .button-off {
+  color : #a0a0a0;
+  border-color: #a0a0a0;
+  cursor: auto;
+}
+
+.cv-button-group {
+  display: block;
+  border-color: solid gray 1px;
+}
+
+.age-btn {
+  color: gray;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-left: 0;
+}
+
+
+.modal {
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(0,0,0, 0.4);
+  position: fixed;
+  top: 0;
+  left: 0
+
+}
+
+.modal__content {
+  padding: 20px;
+  border-radius: 12px;
+  background-color: white;
+  height: 200px;
+  width: 100px;
+}
+ .btn-group-off {
+  color: white;
+ }
+
