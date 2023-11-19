@@ -5,8 +5,10 @@ import { ReactComponent as ArrowDownSvg } from '../../icons/arrow-down.svg'
 import { ReactComponent as ArrowUpSvg } from '../../icons/arrow-up.svg'
 import { ReactComponent as TrashSvg } from '../../icons/trash.svg'
 import { useContext, useEffect, useRef, useState } from "react"
+import InputMask from 'react-input-mask';
+import { DateInput, Input } from '@skbkontur/react-ui'
 import context from 'react-bootstrap/esm/AccordionContext'
-import { Button, Dropdown, DropdownButton, FormControl, InputGroup, Modal, Form, Container, Col, Row} from 'react-bootstrap'
+import { Button, Dropdown, DropdownButton,OverlayTrigger, Tooltip , Modal, Form, Container, Col, Row, ListGroup} from 'react-bootstrap'
 import { switchTitle } from '../../constants'
 
 export const Edit_Resume = () => {
@@ -20,7 +22,7 @@ export const Edit_Resume = () => {
 function Main_Resume(props) {    
     const [elementState, setElementState] = useState({
         'Опыт работы' : [{id : 1, specialization : '123', company : 'hurtle', description : 'ba bl bla'}],
-        'Образование' : [{id : 1, university : '', degree : '', description : ''}],
+        'Образование' : [{id : 1, university : '', degree : '', description : '', date : ''}],
         'Активности' : [{id : 1, role : '', organization : '', description : ''}],
         'Навыки' : [{id : 1, skill : '', description : ''}],
         'Курсы и сертификаты' : [{id : 1, organization: '', date : '', description : ''}],
@@ -125,8 +127,10 @@ function Main_Resume(props) {
     <Main_Info/>
     <div className="h-px w-full bg-black-c" ></div>
     <Links/>
+    <MonthYearInput/>
     {state.sort((a, b) => a.id > b.id ? 1: -1).map((part, i ) => <div style={part.active === false ? {display: 'none'} : {}}>
         {getTag(part.title)}</div>)}
+    
     </div>
 </div>
 </div>
@@ -190,6 +194,10 @@ const Main_Info = () => {
                 <AgeDropdown/>
 
             </div>
+            <textarea className='w-100 fs-12' style={{maxHeight: '100%', height: '200px'}} placeholder='Этот блок заполни после того, как закончишь резюме.
+             Напиши 3-4 предложения, почему тебе интересна сфера деятельности или позиция в компании,
+              если ты подаешь резюме на конкретную вакансию,
+               чем твой опыт может быть полезен в этой роли, направлении.'></textarea>
             </div>
         </div>
               
@@ -291,9 +299,65 @@ function Contacts() {
 
 
 
-function Links() {
-    return <p>ссылка</p>
-}
+const Links = () => {
+  const [links, setLinks] = useState([]);
+  const [newLink, setNewLink] = useState({ label: '', url: '' });
+
+  const handleAddLink = () => {
+    setLinks([...links, newLink]);
+    setNewLink({ label: '', url: '' });
+  };
+
+  const handleDeleteLink = (index) => {
+    const updatedLinks = links.filter((_, i) => i !== index);
+    setLinks(updatedLinks);
+  };
+
+  return (
+    <div>
+      <Dropdown className='mt-3'>
+        <Dropdown.Toggle variant="primary" id="dropdown-basic">
+          Добавить ссылку
+        </Dropdown.Toggle>
+        <Dropdown.Menu>
+          <Form>
+            <Form.Group>
+              <Form.Label>Название</Form.Label>
+              <Form.Control 
+                type="text" 
+                value={newLink.label} 
+                onChange={(e) => setNewLink({ ...newLink, label: e.target.value })} 
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Ссылка</Form.Label>
+              <Form.Control 
+                type="text" 
+                value={newLink.url} 
+                onChange={(e) => setNewLink({ ...newLink, url: e.target.value })} 
+              />
+            </Form.Group>
+            <Button onClick={handleAddLink}>Подтвердить</Button>
+          </Form>
+        </Dropdown.Menu>
+      </Dropdown>
+      <ListGroup>
+  {links.map((link, index) => (
+    <ListGroup.Item key={index}>
+      <div className="d-flex justify-content-between align-items-center">
+        <a href={link.url.startsWith('http') ? link.url : `https://${link.url}`} target="_blank" rel="noopener noreferrer">
+          {link.label}
+        </a>
+        <Button variant="danger" size="sm" onClick={() => handleDeleteLink(index)}>X</Button>
+      </div>
+    </ListGroup.Item>
+  ))}
+</ListGroup>
+    </div>
+  );
+};
+
+export default Links;
 
 
 function Work_Expirience({setGlobalState, findId, downPart, upPart, savedState, setElementState}){
@@ -307,60 +371,6 @@ function Work_Expirience({setGlobalState, findId, downPart, upPart, savedState, 
       ;
     }, [state]);
   
-
-    const Element = ({data, setState, index}) => {
-        const swapItems = (direction) => {
-            setState((prevState) => {
-              const newState = [...prevState];
-              const temp = newState[index];
-              if (direction === 'up' && index > 0) {
-                newState[index] = newState[index - 1];
-                newState[index - 1] = temp;
-              } else if (direction === 'down' && index < newState.length - 1) {
-                newState[index] = newState[index + 1];
-                newState[index + 1] = temp;
-              }
-              return newState;
-            });
-          };
-
-        
-        return <div className='work-expirience'>
-        <div className="mb-3 d-flex col" style={{ alignItems:'baseline'}}>
-        <div className='btn-group-vertical' role="group" style={{marginLeft: '-60px', marginRight : '10px', marginBottom: '10px', borderRadius: '2px', display : ''}}>
-                    <button  type="button" class="btn btn-outline-secondary" onClick={() => swapItems('up')}><ArrowUpSvg stroke='black' /></button>
-                    <button type="button" class="btn btn-outline-secondary" onClick={() => swapItems('down')}><ArrowDownSvg stroke='black' /></button>
-                    <button type="button" class="btn btn-outline-secondary" onClick={() => setState(prevState => prevState.filter((_, i) => i !== index))}><TrashSvg/></button>
-                    
-                    </div>
-            <div className="row">
-                <input value={data.specialization} onChange={e => setState(p => p.map((el, i) => {
-                if (i  === index) {
-                    el.specialization = e.target.value
-                }
-                return el
-            } ))} className="pb-4 pt-2" cols='1' style={{fontSize:'1.2rem', maxWidth: '20px', minWidth:'300px'}} placeholder="Должность, позиция"></input>
-                <input value={data.company} onChange={e => setState(p => p.map((el, i) => {
-                if (i  === index) {
-                    el.company = e.target.value
-                }
-                return el
-            } ))} cols='1' style={{height: '1.5rem', maxWidth:'200px'}} placeholder="Компания"></input>
-                <p>Здесь будет дата</p>
-            </div>
-            <textarea value={data.description} onChange={e => setState(p => p.map((el, i) => {
-                if (i  === index) {
-                    el.description = e.target.value
-                }
-                return el
-            } ))}
-             className="p" style={{fontSize:'0.9rem' , minWidth:'400px', minHeight:'70px', minWidth:'400px'}}
-            placeholder="Опишите конкретные задачи, которые решали. Далее обязательно расскажите, какие результаты были достигнуты за время работы."></textarea>
-
-        </div>
-        </div>
-
-    }
 
     return <div className='flex-col mb-1' style={{display: 'inline-table', alignItems:'start'}} onChange={() => setElementState((prevState) => ({
       ...prevState,
@@ -376,12 +386,66 @@ function Work_Expirience({setGlobalState, findId, downPart, upPart, savedState, 
                 
         </div  >
         <div>
-        {state.map((el, i) => <Element data={el} key={i} index={i} setState={setState} />)}</div>
+        {state.map((el, i) => <WE_Element data={el} key={i} index={i} setState={setState} />)}</div>
         </div>
-
-
-    
+  
 }
+
+const WE_Element = ({data, setState, index}) => {
+  const swapItems = (direction) => {
+      setState((prevState) => {
+        const newState = [...prevState];
+        const temp = newState[index];
+        if (direction === 'up' && index > 0) {
+          newState[index] = newState[index - 1];
+          newState[index - 1] = temp;
+        } else if (direction === 'down' && index < newState.length - 1) {
+          newState[index] = newState[index + 1];
+          newState[index + 1] = temp;
+        }
+        return newState;
+      });
+    };
+
+  
+  return <div className='work-expirience'>
+  <div className="mb-3 d-flex col" style={{ alignItems:'baseline'}}>
+  <div className='btn-group-vertical' role="group" style={{marginLeft: '-60px', marginRight : '10px', marginBottom: '10px', borderRadius: '2px', display : ''}}>
+              <button  type="button" class="btn btn-outline-secondary" onClick={() => swapItems('up')}><ArrowUpSvg stroke='black' /></button>
+              <button type="button" class="btn btn-outline-secondary" onClick={() => swapItems('down')}><ArrowDownSvg stroke='black' /></button>
+              <button type="button" class="btn btn-outline-secondary" onClick={() => setState(prevState => prevState.filter((_, i) => i !== index))}><TrashSvg/></button>
+              
+              </div>
+      <div className="row">
+          <input value={data.specialization} onChange={e => setState(p => p.map((el, i) => {
+          if (i  === index) {
+              el.specialization = e.target.value
+          }
+          return el
+      } ))} className="pb-4 pt-2" cols='1' style={{fontSize:'1.2rem', maxWidth: '20px', minWidth:'300px'}} placeholder="Должность, позиция"></input>
+          <input value={data.company} onChange={e => setState(p => p.map((el, i) => {
+          if (i  === index) {
+              el.company = e.target.value
+          }
+          return el
+      } ))} cols='1' style={{height: '1.5rem', maxWidth:'200px'}} placeholder="Компания"></input>
+          <p>Здесь будет дата</p>
+      </div>
+      <textarea value={data.description} onChange={e => setState(p => p.map((el, i) => {
+          if (i  === index) {
+              el.description = e.target.value
+          }
+          return el
+      } ))}
+       className="p" style={{fontSize:'0.9rem' , minWidth:'400px', minHeight:'70px', minWidth:'400px'}}
+      placeholder="Опишите конкретные задачи, которые решали. Далее обязательно расскажите, какие результаты были достигнуты за время работы."></textarea>
+
+  </div>
+  </div>
+
+}
+
+
 
 
 
@@ -396,55 +460,6 @@ function Education({setGlobalState, findId, downPart, upPart, savedState, setEle
       ;
     }, [state]);
 
-    const Element = ({data, setState, index}) => {
-        const swapItems = (direction) => {
-            setState((prevState) => {
-              const newState = [...prevState];
-              const temp = newState[index];
-              if (direction === 'up' && index > 0) {
-                newState[index] = newState[index - 1];
-                newState[index - 1] = temp;
-              } else if (direction === 'down' && index < newState.length - 1) {
-                newState[index] = newState[index + 1];
-                newState[index + 1] = temp;
-              }
-              return newState;
-            });
-          };
-
-
-    return <div className="education">
-        <div className="d-flex col " style={{ alignItems:'baseline'}}>
-        <div className='btn-group-vertical' role="group" style={{marginLeft: '-60px', marginRight : '10px', marginBottom: '10px', borderRadius: '2px', display : ''}}>
-                    <button  type="button" class="btn btn-outline-secondary" onClick={() => swapItems('up')}><ArrowUpSvg stroke='black' /></button>
-                    <button type="button" class="btn btn-outline-secondary" onClick={() => swapItems('down')}><ArrowDownSvg stroke='black' /></button>
-                    <button type="button" class="btn btn-outline-secondary" onClick={() => setState(prevState => prevState.filter((_, i) => i !== index))}><TrashSvg/></button>
-                    </div>
-            <div className="row">
-            <input value={data.university} onChange={e => setState(p => p.map((el, i) => {
-                if (i  === index) {
-                    el.university = e.target.value
-                }
-                return el
-            } ))} className="pb-1 pt-1 h-1.9" style={{fontSize:'1.2rem', minWidth:"300px"}} cols='1' placeholder="Название учреждения"></input>
-            <input value={data.degree} onChange={e => setState(p => p.map((el, i) => {
-                if (i  === index) {
-                    el.degree = e.target.value
-                }
-                return el
-            } ))} className="pb-3" placeholder="Степень"></input>
-            <p>Здесь будет дата</p>
-            </div>
-            <textarea value={data.description} onChange={e => setState(p => p.map((el, i) => {
-                if (i  === index) {
-                    el.description = e.target.value
-                }
-                return el
-            } ))} className="p" style={{fontSize:'0.9rem' , minWidth:'400px', minHeight:'70px', minWidth:'400px'}} 
-            placeholder="Укажите название образовательной программы или специализации. Расскажите подробнее о ваших активностях в университете."></textarea>
-        </div>
-    </div>}
-
     return <div className='flex-col mb-1' style={{display: 'inline-table', alignItems:'start'}}>
         <div className="" style={{fontSize: "1.9rem" ,maxHeight:'50px', maxWidth: 'fit-content', display: 'inline-table'}}>Образование</div>
         <div className='btn-group' role="group" style={{marginLeft: '10px', marginBottom: '10px', borderRadius: '2px'}}>
@@ -454,9 +469,59 @@ function Education({setGlobalState, findId, downPart, upPart, savedState, setEle
         <button type="button" className='btn btn-outline-secondary' onClick={() => [setGlobalState((p) => p.map(el => {
                                 if (el.title === 'Образование') {el.active=false} return el})), setState(p => [])]} style={{ color: 'black'}} ><TrashSvg/></button>
         </div>
-        {state.map((el, i) => <Element data={el} key={i} index={i} setState={setState} />)}
+        {state.map((el, i) => <ED_Element data={el} key={i} index={i} setState={setState} />)}
         </div>
         }
+
+
+const ED_Element = ({data, setState, index}) => {
+  const swapItems = (direction) => {
+      setState((prevState) => {
+        const newState = [...prevState];
+        const temp = newState[index];
+        if (direction === 'up' && index > 0) {
+          newState[index] = newState[index - 1];
+          newState[index - 1] = temp;
+        } else if (direction === 'down' && index < newState.length - 1) {
+          newState[index] = newState[index + 1];
+          newState[index + 1] = temp;
+        }
+        return newState;
+      });
+    };
+
+
+return <div className="education">
+  <div className="d-flex col " style={{ alignItems:'baseline'}}>
+  <div className='btn-group-vertical' role="group" style={{marginLeft: '-60px', marginRight : '10px', marginBottom: '10px', borderRadius: '2px', display : ''}}>
+              <button  type="button" class="btn btn-outline-secondary" onClick={() => swapItems('up')}><ArrowUpSvg stroke='black' /></button>
+              <button type="button" class="btn btn-outline-secondary" onClick={() => swapItems('down')}><ArrowDownSvg stroke='black' /></button>
+              <button type="button" class="btn btn-outline-secondary" onClick={() => setState(prevState => prevState.filter((_, i) => i !== index))}><TrashSvg/></button>
+              </div>
+      <div className="row">
+      <input value={data.university} onChange={e => setState(p => p.map((el, i) => {
+          if (i  === index) {
+              el.university = e.target.value
+          }
+          return el
+      } ))} className="pb-1 pt-1 h-1.9" style={{fontSize:'1.2rem', minWidth:"300px"}} cols='1' placeholder="Название учреждения"></input>
+      <input value={data.degree} onChange={e => setState(p => p.map((el, i) => {
+          if (i  === index) {
+              el.degree = e.target.value
+          }
+          return el
+      } ))} className="pb-3" placeholder="Степень"></input>
+      <YearYearInput />
+      </div>
+      <textarea value={data.description} onChange={e => setState(p => p.map((el, i) => {
+          if (i  === index) {
+              el.description = e.target.value
+          }
+          return el
+      } ))} className="p" style={{fontSize:'0.9rem' , minWidth:'400px', minHeight:'70px', minWidth:'400px'}} 
+      placeholder="Укажите название образовательной программы или специализации. Расскажите подробнее о ваших активностях в университете."></textarea>
+  </div>
+</div>}
 
 
 function Skills({setGlobalState, findId, downPart, upPart,savedState, setElementState}){
@@ -469,51 +534,6 @@ function Skills({setGlobalState, findId, downPart, upPart,savedState, setElement
         }))
     }, [state]);
 
-    const Element = ({data, setState, index}) => {
-        const swapItems = (direction) => {
-            setState((prevState) => {
-              const newState = [...prevState];
-              const temp = newState[index];
-              if (direction === 'up' && index > 0) {
-                newState[index] = newState[index - 1];
-                newState[index - 1] = temp;
-              } else if (direction === 'down' && index < newState.length - 1) {
-                newState[index] = newState[index + 1];
-                newState[index + 1] = temp;
-              }
-              return newState;
-            });
-          };
-
-    
-
-    return <div className='skill' style={{maxWidth: '200px', marginRight: '50px'}}>
-    <div 
-    className='d-flex' style={{ alignItems:'baseline'}}>
-        <div className='btn-group-vertical' role="group" style={{marginLeft: '-60px', marginRight : '10px', marginBottom: '10px', borderRadius: '2px', display : ''}}>
-                    <button  type="button" class="btn btn-outline-secondary" onClick={() => swapItems('up')}><ArrowUpSvg stroke='black' /></button>
-                    <button type="button" class="btn btn-outline-secondary" onClick={() => swapItems('down')}><ArrowDownSvg stroke='black' /></button>
-                    <button type="button" class="btn btn-outline-secondary" onClick={() => setState(prevState => prevState.filter((_, i) => i !== index))}><TrashSvg/></button>
-                    </div>
-        <div className='row' >
-        <div className='mb-1'>
-        <span className='fs-3' style={{width : 'fit-content'}}>#</span>
-        <input className='fs-3' onChange={e => setState(p => p.map((el, i) => {
-                if (i  === index) {
-                    el.skill = e.target.value
-                }
-                return el
-            } ))} value={data.skill} placeholder='Навык'></input>
-            </div>
-        <textarea onChange={e => setState(p => p.map((el, i) => {
-                if (i  === index) {
-                    el.description = e.target.value
-                }
-                return el
-            } ))} value={data.description} style={{maxWidth : '200px'}} placeholder='Описание'></textarea>
-        </div>
-
-        </div></div>}
 
     return <div className='d-flex-col' style={{display: 'inline-table', alignItems:'start'}}>
     <div className="" style={{fontSize: "1.9rem" ,maxHeight:'50px', maxWidth: 'fit-content', display: 'inline-table'}}>Навыки</div>
@@ -524,11 +544,55 @@ function Skills({setGlobalState, findId, downPart, upPart,savedState, setElement
     <button type="button" className='btn btn-outline-secondary' onClick={() => [setGlobalState((p) => p.map(el => {
                                 if (el.title === 'Навыки') {el.active=false} return el})), setState(p => [])]} style={{ color: 'black'}}><TrashSvg/></button>
     </div>
-    <div className='element-container'>{state.map((el, i) => <Element data={el} key={i} index={i} setState={setState}/>)}</div>
+    <div className='element-container'>{state.map((el, i) => <S_Element data={el} key={i} index={i} setState={setState}/>)}</div>
     </div>
 }
 
+const S_Element = ({data, setState, index}) => {
+  const swapItems = (direction) => {
+      setState((prevState) => {
+        const newState = [...prevState];
+        const temp = newState[index];
+        if (direction === 'up' && index > 0) {
+          newState[index] = newState[index - 1];
+          newState[index - 1] = temp;
+        } else if (direction === 'down' && index < newState.length - 1) {
+          newState[index] = newState[index + 1];
+          newState[index + 1] = temp;
+        }
+        return newState;
+      });
+    };
 
+
+
+return <div className='skill' style={{maxWidth: '200px', marginRight: '50px'}}>
+<div 
+className='d-flex' style={{ alignItems:'baseline'}}>
+  <div className='btn-group-vertical' role="group" style={{marginLeft: '-60px', marginRight : '10px', marginBottom: '10px', borderRadius: '2px', display : ''}}>
+              <button  type="button" class="btn btn-outline-secondary" onClick={() => swapItems('up')}><ArrowUpSvg stroke='black' /></button>
+              <button type="button" class="btn btn-outline-secondary" onClick={() => swapItems('down')}><ArrowDownSvg stroke='black' /></button>
+              <button type="button" class="btn btn-outline-secondary" onClick={() => setState(prevState => prevState.filter((_, i) => i !== index))}><TrashSvg/></button>
+              </div>
+  <div className='row' >
+  <div className='mb-1'>
+  <span className='fs-3' style={{width : 'fit-content'}}>#</span>
+  <input className='fs-3' onChange={e => setState(p => p.map((el, i) => {
+          if (i  === index) {
+              el.skill = e.target.value
+          }
+          return el
+      } ))} value={data.skill} placeholder='Навык'></input>
+      </div>
+  <textarea onChange={e => setState(p => p.map((el, i) => {
+          if (i  === index) {
+              el.description = e.target.value
+          }
+          return el
+      } ))} value={data.description} style={{maxWidth : '200px'}} placeholder='Описание'></textarea>
+  </div>
+
+  </div></div>}
 
 
 function Activities({setGlobalState, findId, downPart, upPart, savedState, setElementState}){
@@ -542,56 +606,6 @@ function Activities({setGlobalState, findId, downPart, upPart, savedState, setEl
         }))
     }, [state]);
 
-    const Element = ({data, setState, index}) => {
-        const swapItems = (direction) => {
-            setState((prevState) => {
-              const newState = [...prevState];
-              const temp = newState[index];
-              if (direction === 'up' && index > 0) {
-                newState[index] = newState[index - 1];
-                newState[index - 1] = temp;
-              } else if (direction === 'down' && index < newState.length - 1) {
-                newState[index] = newState[index + 1];
-                newState[index + 1] = temp;
-              }
-              return newState;
-            });
-          };
-
-
-        return <div className='activities'>
-        <div className="d-flex col" style={{ alignItems:'baseline'}}>
-        <div className='btn-group-vertical' role="group" style={{marginLeft: '-60px', marginRight : '10px', marginBottom: '10px', borderRadius: '2px', display : ''}}>
-                    <button  type="button" class="btn btn-outline-secondary" onClick={() => swapItems('up')}><ArrowUpSvg stroke='black' /></button>
-                    <button type="button" class="btn btn-outline-secondary" onClick={() => swapItems('down')}><ArrowDownSvg stroke='black' /></button>
-                    <button type="button" class="btn btn-outline-secondary" onClick={() => setState(prevState => prevState.filter((_, i) => i !== index))}><TrashSvg/></button>
-                    
-                    </div>
-            <div className="row">
-            <input value={data.role} onChange={e => setState(p => p.map((el, i) => {
-                if (i  === index) {
-                    el.role = e.target.value
-                }
-                return el
-            } ))} className="pb-1 pt-1 h-1.9" style={{fontSize:'1.2rem', minWidth:"300px"}} cols='1' placeholder="Роль"></input>
-            <input onChange={e => setState(p => p.map((el, i) => {
-                if (i  === index) {
-                    el.organization = e.target.value
-                }
-                return el
-            } ))} value={data.organization} className="pb-3" placeholder="Организация или место"></input>
-            <p>Здесь будет дата</p>
-            </div>
-            <textarea onChange={e => setState(p => p.map((el, i) => {
-                if (i  === index) {
-                    el.description = e.target.value
-                }
-                return el
-            } ))} value={data.description} className="p" style={{fontSize:'0.9rem' , minWidth:'400px', minHeight:'70px', minWidth:'400px'}}
-         placeholder="Опишите конкретные задачи, которые решали. Далее обязательно расскажите, какие результаты были достигнуты за время работы."></textarea>
-        </div>
-    </div>}
-
     return <div className='flex-col mb-1' style={{display: 'inline-table', alignItems:'start'}} >
     <div className="" style={{fontSize: "1.9rem" ,maxHeight:'50px', maxWidth: 'fit-content', display: 'inline-table'}}>Активности</div>
     <div className='btn-group' role="group" style={{marginLeft: '10px', marginBottom: '10px', borderRadius: '2px'}}>
@@ -601,10 +615,59 @@ function Activities({setGlobalState, findId, downPart, upPart, savedState, setEl
     <button type="button" className='btn btn-outline-secondary' onClick={() => [setGlobalState((p) => p.map(el => {
                                 if (el.title === 'Активности') {el.active=false} return el})), setState(p => [])]} style={{ color: 'black'}}><TrashSvg/></button>
     </div>
-    {state.map((el, i) => <Element data={el} key={i} index={i} setState={setState} />)}
+    {state.map((el, i) => <A_Element data={el} key={i} index={i} setState={setState} />)}
     </div>
 }
 
+const A_Element = ({data, setState, index}) => {
+  const swapItems = (direction) => {
+      setState((prevState) => {
+        const newState = [...prevState];
+        const temp = newState[index];
+        if (direction === 'up' && index > 0) {
+          newState[index] = newState[index - 1];
+          newState[index - 1] = temp;
+        } else if (direction === 'down' && index < newState.length - 1) {
+          newState[index] = newState[index + 1];
+          newState[index + 1] = temp;
+        }
+        return newState;
+      });
+    };
+
+
+  return <div className='activities'>
+  <div className="d-flex col" style={{ alignItems:'baseline'}}>
+  <div className='btn-group-vertical' role="group" style={{marginLeft: '-60px', marginRight : '10px', marginBottom: '10px', borderRadius: '2px', display : ''}}>
+              <button  type="button" class="btn btn-outline-secondary" onClick={() => swapItems('up')}><ArrowUpSvg stroke='black' /></button>
+              <button type="button" class="btn btn-outline-secondary" onClick={() => swapItems('down')}><ArrowDownSvg stroke='black' /></button>
+              <button type="button" class="btn btn-outline-secondary" onClick={() => setState(prevState => prevState.filter((_, i) => i !== index))}><TrashSvg/></button>
+              
+              </div>
+      <div className="row">
+      <input value={data.role} onChange={e => setState(p => p.map((el, i) => {
+          if (i  === index) {
+              el.role = e.target.value
+          }
+          return el
+      } ))} className="pb-1 pt-1 h-1.9" style={{fontSize:'1.2rem', minWidth:"300px"}} cols='1' placeholder="Роль"></input>
+      <input onChange={e => setState(p => p.map((el, i) => {
+          if (i  === index) {
+              el.organization = e.target.value
+          }
+          return el
+      } ))} value={data.organization} className="pb-3" placeholder="Организация или место"></input>
+      <p>Здесь будет дата</p>
+      </div>
+      <textarea onChange={e => setState(p => p.map((el, i) => {
+          if (i  === index) {
+              el.description = e.target.value
+          }
+          return el
+      } ))} value={data.description} className="p" style={{fontSize:'0.9rem' , minWidth:'400px', minHeight:'70px', minWidth:'400px'}}
+   placeholder="Опишите конкретные задачи, которые решали. Далее обязательно расскажите, какие результаты были достигнуты за время работы."></textarea>
+  </div>
+</div>}
 
 function Courses({setGlobalState, findId, downPart, upPart, savedState, setElementState}){
     const [state, setState] = useState(savedState)
@@ -616,54 +679,6 @@ function Courses({setGlobalState, findId, downPart, upPart, savedState, setEleme
         }))
     }, [state]);
 
-    const Element = ({data, setState, index}) => {
-        const swapItems = (direction) => {
-            setState((prevState) => {
-              const newState = [...prevState];
-              const temp = newState[index];
-              if (direction === 'up' && index > 0) {
-                newState[index] = newState[index - 1];
-                newState[index - 1] = temp;
-              } else if (direction === 'down' && index < newState.length - 1) {
-                newState[index] = newState[index + 1];
-                newState[index + 1] = temp;
-              }
-              return newState;
-            });
-          };
-        
-        return <div className="courses">
-        <div className="d-flex col" style={{ alignItems:'baseline'}}>
-        <div className='btn-group-vertical' role="group" style={{marginLeft: '-60px', marginRight : '10px', marginBottom: '10px', borderRadius: '2px', display : ''}}>
-                    <button  type="button" class="btn btn-outline-secondary" onClick={() => swapItems('up')}><ArrowUpSvg stroke='black' /></button>
-                    <button type="button" class="btn btn-outline-secondary" onClick={() => swapItems('down')}><ArrowDownSvg stroke='black' /></button>
-                    <button type="button" class="btn btn-outline-secondary" onClick={() => setState(prevState => prevState.filter((_, i) => i !== index))}><TrashSvg/></button>
-                    
-                    </div>
-            <div className="row">
-            <input value={data.organization} onChange={e => setState(p => p.map((el, i) => {
-                if (i  === index) {
-                    el.organization = e.target.value
-                }
-                return el
-            } ))} className="pb-1 pt-1 h-1.9" style={{fontSize:'1.2rem', minWidth:"300px"}} cols='1' placeholder="Название учреждения"></input>
-            <input value={data.date} onChange={e => setState(p => p.map((el, i) => {
-                if (i  === index) {
-                    el.date = e.target.value
-                }
-                return el
-            } ))} className="pb-3" maxLength='4' type="" placeholder="гггг" ></input>
-            </div>
-            <textarea value={data.description} onChange={e => setState(p => p.map((el, i) => {
-                if (i  === index) {
-                    el.description = e.target.value
-                }
-                return el
-            } ))} className="p" style={{fontSize:'0.9rem' , minWidth:'400px', minHeight:'70px', minWidth:'400px'}}
-         placeholder="Укажите название образовательной программы или специализации. Если были проекты для портфолио, укажите ссылки."></textarea>
-        </div>
-    </div>}
-
 
     return <div className='flex-col mb-1' style={{display: 'inline-table', alignItems:'start'}}>
         <div className="" style={{fontSize: "1.9rem" ,maxHeight:'50px', maxWidth: 'fit-content', display: 'inline-table'}}>Курсы и сертификаты</div>
@@ -674,9 +689,58 @@ function Courses({setGlobalState, findId, downPart, upPart, savedState, setEleme
         <button type="button" className='btn btn-outline-secondary' onClick={() => [setGlobalState((p) => p.map(el => {
                                 if (el.title === 'Курсы и сертификаты') {el.active=false} return el})), setState(p => [])]} style={{ color: 'black'}}><TrashSvg/></button>
         </div>
-        {state.sort((a, b) => a.id > b.id ? 1: -1).map((el, i) => <Element data={el} key={i} index={i} setState={setState} />)}
+        {state.sort((a, b) => a.id > b.id ? 1: -1).map((el, i) => <C_Element data={el} key={i} index={i} setState={setState} />)}
         </div>
 }
+
+
+const C_Element = ({data, setState, index}) => {
+  const swapItems = (direction) => {
+      setState((prevState) => {
+        const newState = [...prevState];
+        const temp = newState[index];
+        if (direction === 'up' && index > 0) {
+          newState[index] = newState[index - 1];
+          newState[index - 1] = temp;
+        } else if (direction === 'down' && index < newState.length - 1) {
+          newState[index] = newState[index + 1];
+          newState[index + 1] = temp;
+        }
+        return newState;
+      });
+    };
+  
+  return <div className="courses">
+  <div className="d-flex col" style={{ alignItems:'baseline'}}>
+  <div className='btn-group-vertical' role="group" style={{marginLeft: '-60px', marginRight : '10px', marginBottom: '10px', borderRadius: '2px', display : ''}}>
+              <button  type="button" class="btn btn-outline-secondary" onClick={() => swapItems('up')}><ArrowUpSvg stroke='black' /></button>
+              <button type="button" class="btn btn-outline-secondary" onClick={() => swapItems('down')}><ArrowDownSvg stroke='black' /></button>
+              <button type="button" class="btn btn-outline-secondary" onClick={() => setState(prevState => prevState.filter((_, i) => i !== index))}><TrashSvg/></button>
+              
+              </div>
+      <div className="row">
+      <input value={data.organization} onChange={e => setState(p => p.map((el, i) => {
+          if (i  === index) {
+              el.organization = e.target.value
+          }
+          return el
+      } ))} className="pb-1 pt-1 h-1.9" style={{fontSize:'1.2rem', minWidth:"300px"}} cols='1' placeholder="Название учреждения"></input>
+      <input value={data.date} onChange={e => setState(p => p.map((el, i) => {
+          if (i  === index) {
+              el.date = e.target.value
+          }
+          return el
+      } ))} className="pb-3" maxLength='4' type="" placeholder="гггг" ></input>
+      </div>
+      <textarea value={data.description} onChange={e => setState(p => p.map((el, i) => {
+          if (i  === index) {
+              el.description = e.target.value
+          }
+          return el
+      } ))} className="p" style={{fontSize:'0.9rem' , minWidth:'400px', minHeight:'70px', minWidth:'400px'}}
+   placeholder="Укажите название образовательной программы или специализации. Если были проекты для портфолио, укажите ссылки."></textarea>
+  </div>
+</div>}
 
 function Other({setGlobalState, findId, downPart, upPart, savedState, setElementState}){
 
@@ -689,45 +753,6 @@ function Other({setGlobalState, findId, downPart, upPart, savedState, setElement
         }))
     }, [state]);
 
-    const Element = ({data, setState, index}) => {
-        const swapItems = (direction) => {
-            setState((prevState) => {
-              const newState = [...prevState];
-              const temp = newState[index];
-              if (direction === 'up' && index > 0) {
-                newState[index] = newState[index - 1];
-                newState[index - 1] = temp;
-              } else if (direction === 'down' && index < newState.length - 1) {
-                newState[index] = newState[index + 1];
-                newState[index + 1] = temp;
-              }
-              return newState;
-            });
-          };
-
-        return <div className="other" >
-        <div className=''>
-            <div className='btn-group-vertical ' role="group"  style={{marginLeft: '-60px', marginRight : '10px', marginBottom: '-70px', borderRadius: '2px', display : ''}}>
-                        <button  type="button" class="btn btn-outline-secondary" onClick={() => swapItems('up')}><ArrowUpSvg stroke='black' /></button>
-                        <button type="button" class="btn btn-outline-secondary" onClick={() => swapItems('down')}><ArrowDownSvg stroke='black' /></button>
-                        <button type="button" class="btn btn-outline-secondary" onClick={() => setState(prevState => prevState.filter((_, i) => i !== index))}><TrashSvg/></button>
-                        
-                        </div>
-            <input value={data.title} onChange={e => setState(p => p.map((el, i) => {
-                    if (i  === index) {
-                        el.title = e.target.value
-                    }
-                    return el
-                } ))} className="pb-1 pt-1 fs-2" style={{minWidth:"300px"}} cols='1' placeholder="Заголовок"></input>
-            <textarea onChange={e => setState(p => p.map((el, i) => {
-                    if (i  === index) {
-                        el.description = e.target.value
-                    }
-                    return el
-                } ))} value={data.description} className="" style={{fontSize:'1rem' , minWidth:'400px', minHeight:'70px', width:'100%'}}
-            placeholder="Расскажите больше о себе. Напишите о своих интересах. Например, занятия в волейбольном кружке могут говорить о твоём умении работать в команде."></textarea>
-        </div>
-    </div>}
 
         return <div className='flex-col mb-1' style={{display: 'inline-table', alignItems:'start'}}>
         <div className="" style={{fontSize: "1.9rem" ,maxHeight:'50px', maxWidth: 'fit-content', display: 'inline-table'}}>Cвободный блок</div>
@@ -738,10 +763,50 @@ function Other({setGlobalState, findId, downPart, upPart, savedState, setElement
         <button type="button" className='btn btn-outline-secondary' onClick={() => [setGlobalState((p) => p.map(el => {
                                     if (el.title === 'Свободный блок') {el.active=false} return el})), setState(p => [])]} style={{ color: 'black'}}><TrashSvg/></button>
         </div>
-        {state.map((el, i) => <Element data={el} key={i} index={i} setState={setState} />)}
+        {state.map((el, i) => <O_Element data={el} key={i} index={i} setState={setState} />)}
     </div>
 }
 
+
+const O_Element = ({data, setState, index}) => {
+  const swapItems = (direction) => {
+      setState((prevState) => {
+        const newState = [...prevState];
+        const temp = newState[index];
+        if (direction === 'up' && index > 0) {
+          newState[index] = newState[index - 1];
+          newState[index - 1] = temp;
+        } else if (direction === 'down' && index < newState.length - 1) {
+          newState[index] = newState[index + 1];
+          newState[index + 1] = temp;
+        }
+        return newState;
+      });
+    };
+
+  return <div className="other" >
+  <div className=''>
+      <div className='btn-group-vertical ' role="group"  style={{marginLeft: '-60px', marginRight : '10px', marginBottom: '-70px', borderRadius: '2px', display : ''}}>
+                  <button  type="button" class="btn btn-outline-secondary" onClick={() => swapItems('up')}><ArrowUpSvg stroke='black' /></button>
+                  <button type="button" class="btn btn-outline-secondary" onClick={() => swapItems('down')}><ArrowDownSvg stroke='black' /></button>
+                  <button type="button" class="btn btn-outline-secondary" onClick={() => setState(prevState => prevState.filter((_, i) => i !== index))}><TrashSvg/></button>
+                  
+                  </div>
+      <input value={data.title} onChange={e => setState(p => p.map((el, i) => {
+              if (i  === index) {
+                  el.title = e.target.value
+              }
+              return el
+          } ))} className="pb-1 pt-1 fs-2" style={{minWidth:"300px"}} cols='1' placeholder="Заголовок"></input>
+      <textarea onChange={e => setState(p => p.map((el, i) => {
+              if (i  === index) {
+                  el.description = e.target.value
+              }
+              return el
+          } ))} value={data.description} className="" style={{fontSize:'1rem' , minWidth:'400px', minHeight:'70px', width:'100%'}}
+      placeholder="Расскажите больше о себе. Напишите о своих интересах. Например, занятия в волейбольном кружке могут говорить о твоём умении работать в команде."></textarea>
+  </div>
+</div>}
 
 function Sidebar({setToggleShown, currentState}){
     const [toggleState, setToggleState] = useState(1)
@@ -909,7 +974,7 @@ const AgeDropdown = () => {
       
   
     const handleInputChange = (e) => {
-      setInputValue(e.target.value);
+      setInputValue(e);
     };
   
     const handleConfirm = () => {
@@ -920,6 +985,9 @@ const AgeDropdown = () => {
       setInputValue('');
       setButtonText('Возраст');
     };
+    const handleCalendarClick = (e) => {
+    e.stopPropagation(); // Предотвращает всплытие события клика до родительских элементов
+  };
   
     const handleDropdownToggle = (isOpen) => {
       setShowDropdown(isOpen);
@@ -929,21 +997,20 @@ const AgeDropdown = () => {
     };
   
     return (
-      <DropdownButton
+      <DropdownButton 
         title={buttonText}
         show={showDropdown}
         onToggle={handleDropdownToggle}
         id='dropdown-btn'
-        className='btn' style={{border : 'none'}}
-        toggle={false}
-      >
-        <span>Возраст</span>
-          <input className='bg-info'
+        className='btn' data-toggle="dropdown" style={{border : 'none'}}
+        toggle={false}>
+        <span>Дата рождения</span>
+          <DateInput 
             type="text"
             ref={inputRef}
             value={inputValue}
-            onChange={handleInputChange}
-            onFocus={() => setShowDropdown(true)}
+            onValueChange={handleInputChange}
+            onClick={handleCalendarClick}
           />
         <Dropdown.Divider />
         <Dropdown.Item as="div">
@@ -957,3 +1024,93 @@ const AgeDropdown = () => {
     );
   };
 
+  const YearInputDropdown = ({setData, index, value}) => {
+    const [year1, setYear1] = useState('');
+    const [year2, setYear2] = useState('');
+    const [dropdownTitle, setDropdownTitle] = useState(value);
+    const [showDropdown, setShowDropdown] = useState(false);
+  
+    const confirmHandler = () => {
+      setData(p => p.map((el, i) => {
+        if (i  === index) {
+            el.date = `${year1} – ${year2}`
+        }
+        return el
+    } ))
+      setDropdownTitle(`${year1} – ${year2}`);
+    };
+  
+    const clearHandler = () => {
+      setDropdownTitle('гггг – гггг');
+      setShowDropdown(false);
+      setYear1('');
+      setYear2('');
+    };
+  
+    return (
+      <Dropdown show={showDropdown} onToggle={(shown) => setShowDropdown(shown)}>
+        <Dropdown.Toggle className='btn' id='dropdown-btn' variant="success">
+          {dropdownTitle}
+        </Dropdown.Toggle>
+        <Dropdown.Menu>
+          <Row className="year-input-row"> 
+            <Col>
+              <Form.Group controlId="year1">
+                <Form.Control
+                  type="number"
+                  value={year1}
+                  placeholder="гггг"
+                  onChange={(e) => setYear1(e.target.value)}
+                />
+              </Form.Group>
+            </Col>
+            <Col className="dash">—</Col>
+            <Col>
+              <Form.Group controlId="year2">
+                <Form.Control
+                  type="number"
+                  value={year2}
+                  placeholder="гггг"
+                  onChange={(e) => setYear2(e.target.value)}
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+          <Button variant="primary" onClick={confirmHandler}>Подтвердить</Button>{' '}
+          <Button variant="danger" onClick={clearHandler}>Удалить</Button>
+          <button onClick={() => setShowDropdown(false)}>Закрыть</button>
+          
+        </Dropdown.Menu>
+      </Dropdown>
+    );
+  };
+  
+
+  const MonthYearInput = () => {
+    const handleChange = (e) => {
+      // Обработка введенного значения
+    };
+  
+    return (
+      <div>
+        <InputMask mask="99.9999" maskChar="_" onChange={handleChange}>
+          {(inputProps) => <input {...inputProps} type="text" />}
+        </InputMask>
+      </div>
+    );
+  };
+  
+
+  const YearYearInput = () => {
+    const handleChange = (e) => {
+      // Обработка введенного значения
+    };
+  
+    return (
+      <div>
+        <InputMask style={{border: 'solid 1px black'}} mask="9999-9999" maskChar="_" onChange={handleChange}>
+          {(inputProps) => <input {...inputProps} type="text" />}
+        </InputMask>
+      </div>
+    );
+  };
